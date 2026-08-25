@@ -1,6 +1,6 @@
-# Sistema de Control de Inventario y Multifuncionales
+# Seguimiento de Egresados / Sistema de Inventario - Aplicaciones Web
 
-Sistema integral para la gestión y control de inventario, asignación de equipos multifuncionales, despachos, sedes, personal y registro de mantenimientos.
+Sistema desarrollado en **Spring Boot 4 / Java 21** con **PostgreSQL / MySQL** y **JPA / Hibernate** para la gestión de inventario, equipos multifuncionales, personal, sedes, despachos y asignaciones.
 
 ---
 
@@ -11,13 +11,14 @@ Sistema integral para la gestión y control de inventario, asignación de equipo
 - **Persistencia / ORM:** Hibernate / Jakarta Persistence API
 - **Bases de Datos Compatibles:** PostgreSQL (Principal) y MySQL
 - **Gestor de Dependencias:** Apache Maven
+- **Control de Versiones:** Git & GitHub (`SeguimientoEgresados_AplicacionesWeb`)
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```text
-SistemaInventario_AplicacionesWeb/
+SeguimientoEgresados_AplicacionesWeb/
 ├── backend/
 │   └── proyectoinventario/
 │       ├── pom.xml
@@ -82,7 +83,13 @@ El modelo relacional se compone de **16 entidades** organizadas en módulos:
 
 ## 🛠️ Configuración y Ejecución
 
-### 1. Base de Datos (PostgreSQL)
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/KinglotusPe/SeguimientoEgresados_AplicacionesWeb.git
+cd SeguimientoEgresados_AplicacionesWeb
+```
+
+### 2. Base de Datos (PostgreSQL)
 1. Abre tu cliente PostgreSQL (pgAdmin, DBeaver o psql).
 2. Crea la base de datos `bd_inventario`:
    ```sql
@@ -93,9 +100,11 @@ El modelo relacional se compone de **16 entidades** organizadas en módulos:
    database/01_create_tables_postgresql.sql
    ```
 
-### 2. Configurar el Backend
+### 3. Configurar el Backend
 Revisa el archivo `backend/proyectoinventario/src/main/resources/application.properties`:
 ```properties
+spring.application.name=seguimiento-egresados
+
 spring.datasource.url=jdbc:postgresql://localhost:5432/bd_inventario
 spring.datasource.username=tu_usuario_postgres
 spring.datasource.password=tu_contrasena_postgres
@@ -107,7 +116,7 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-### 3. Compilar y Ejecutar
+### 4. Compilar y Ejecutar
 
 Desde la carpeta `backend/proyectoinventario`:
 
@@ -119,4 +128,4 @@ Desde la carpeta `backend/proyectoinventario`:
 .\mvnw.cmd spring-boot:run
 ```
 
-La aplicación se iniciará en el puerto predeterminado `http://localhost:8080`.
+La aplicación se iniciará en `http://localhost:8080`.
