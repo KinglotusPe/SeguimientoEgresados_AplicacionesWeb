@@ -1,6 +1,17 @@
-# Seguimiento de Egresados / Sistema de Inventario - Aplicaciones Web
+# Sistema de Control de Multifuncionales
 
-Sistema desarrollado en **Spring Boot 4 / Java 21** con **PostgreSQL / MySQL** y **JPA / Hibernate** para la gestión de inventario, equipos multifuncionales, personal, sedes, despachos y asignaciones.
+Sistema para la gestión, trazabilidad y control de equipos multifuncionales distribuidos en los diferentes **Distritos Fiscales**, **Sedes** y **Despachos**, permitiendo la asignación directa al **Personal** responsable y el registro del historial de **Mantenimientos técnicos** preventivos y correctivos.
+
+---
+
+## 📌 Propósito y Dominio del Sistema
+
+El sistema resuelve la necesidad de administrar el parque de multifuncionales en dependencias fiscales mediante:
+1. **Estructura Organizacional Fiscal**: Jerarquía de *Distrito Fiscal* ➔ *Sede* ➔ *Despacho* ➔ *Personal*.
+2. **Catálogo de Equipos Multifuncionales**: Registro por *Marca*, *Modelo*, *Clasificación*, *Estado*, *Código Patrimonial* y *Número de Serie*.
+3. **Control de Asignaciones**: Trazabilidad de qué multifuncional está asignada a qué despacho y funcionario (fecha inicio, fecha fin y observaciones).
+4. **Gestión de Mantenimiento Técnico**: Control de diagnósticos, repuestos sustituidos, trabajos realizados y responsable del servicio técnico.
+5. **Seguridad y Acceso**: Gestión de usuarios, credenciales y asignación de roles.
 
 ---
 
@@ -11,7 +22,7 @@ Sistema desarrollado en **Spring Boot 4 / Java 21** con **PostgreSQL / MySQL** y
 - **Persistencia / ORM:** Hibernate / Jakarta Persistence API
 - **Bases de Datos Compatibles:** PostgreSQL (Principal) y MySQL
 - **Gestor de Dependencias:** Apache Maven
-- **Control de Versiones:** Git & GitHub (`SeguimientoEgresados_AplicacionesWeb`)
+- **Control de Versiones:** Git & GitHub
 
 ---
 
@@ -26,7 +37,7 @@ SeguimientoEgresados_AplicacionesWeb/
 │           ├── main/
 │           │   ├── java/aplicacionesweb/proyectoinventario/
 │           │   │   ├── ProyectoinventarioApplication.java
-│           │   │   └── entity/                    # Entidades JPA
+│           │   │   └── entity/                    # Entidades JPA del Sistema
 │           │   │       ├── AsignacionEquipo.java
 │           │   │       ├── Clasificacion.java
 │           │   │       ├── Despacho.java
@@ -47,67 +58,60 @@ SeguimientoEgresados_AplicacionesWeb/
 │           │       └── application.properties     # Configuración de BD
 │           └── test/
 └── database/
-    ├── 01_create_tables_postgresql.sql            # Script para PostgreSQL
-    └── 01_create_tables_mysql.sql                 # Script para MySQL
+    ├── 01_create_tables_postgresql.sql            # Script DDL PostgreSQL
+    └── 01_create_tables_mysql.sql                 # Script DDL MySQL
 ```
 
 ---
 
-## 🗄️ Modelo de Datos y Entidades
+## 🗄️ Modelo Relacional y Entidades JPA
 
-El modelo relacional se compone de **16 entidades** organizadas en módulos:
+El sistema se compone de **16 entidades** organizadas según su función:
 
-### 1. Tablas Maestras y Catálogos
-- `distrito_fiscal` ([DistritoFiscal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/DistritoFiscal.java)): Distritos fiscales para ubicación de sedes.
-- `tipo_personal` ([TipoPersonal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/TipoPersonal.java)): Clasificación del personal (fiscales, asistentes, administrativos, etc.).
-- `marca` ([Marca](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Marca.java)): Marcas de equipos (HP, Epson, Ricoh, etc.).
-- `clasificacion` ([Clasificacion](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Clasificacion.java)): Categoría o tipo de equipo.
-- `estado_equipo` ([EstadoEquipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/EstadoEquipo.java)): Estado operativo (Operativo, Inoperativo, En Mantenimiento, etc.).
-- `tipo_mantenimiento` ([TipoMantenimiento](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/TipoMantenimiento.java)): Preventivo, Correctivo, etc.
-- `rol` ([Rol](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Rol.java)): Roles de acceso (Administrador, Operador, etc.).
-- `usuario` ([Usuario](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Usuario.java)): Usuarios del sistema y credenciales.
+### 1. Estructura Institucional y Personal
+- `distrito_fiscal` ([DistritoFiscal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/DistritoFiscal.java)): Jurisdicción o distrito fiscal.
+- `sede` ([Sede](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Sede.java)): Sede física vinculada a un distrito fiscal.
+- `despacho` ([Despacho](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Despacho.java)): Despacho o fiscalía perteneciente a una sede (tipo de proceso).
+- `tipo_personal` ([TipoPersonal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/TipoPersonal.java)): Tipo o cargo del personal.
+- `personal` ([Personal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Personal.java)): Funcionarios y trabajadores (DNI, nombres, apellidos, contacto).
 
-### 2. Dependencias Principales
-- `sede` ([Sede](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Sede.java)): Sedes físicas vinculadas a un distrito fiscal.
-- `modelo` ([Modelo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Modelo.java)): Modelos vinculados a una marca.
-- `personal` ([Personal](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Personal.java)): Datos del personal con tipo de contrato/cargo.
-- `despacho` ([Despacho](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Despacho.java)): Despachos o áreas asociadas a cada sede.
-- `equipo` ([Equipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Equipo.java)): Equipos con código patrimonial, número de serie, modelo, clasificación y estado.
+### 2. Catálogo de Multifuncionales
+- `marca` ([Marca](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Marca.java)): Marca del fabricante (HP, Epson, Ricoh, Canon, etc.).
+- `modelo` ([Modelo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Modelo.java)): Modelo técnico por marca.
+- `clasificacion` ([Clasificacion](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Clasificacion.java)): Categoría o tipo de multifuncional.
+- `estado_equipo` ([EstadoEquipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/EstadoEquipo.java)): Estado operativo (Operativo, Inoperativo, En Mantenimiento, Baja).
+- `equipo` ([Equipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Equipo.java)): Ficha del equipo multifuncional con código patrimonial único, número de serie, modelo, estado y fecha de adquisición.
 
-### 3. Transaccionales y Seguridad
-- `asignacion_equipo` ([AsignacionEquipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/AsignacionEquipo.java)): Asignación histórica y activa de un equipo a un despacho y personal.
-- `mantenimiento` ([Mantenimiento](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Mantenimiento.java)): Registro de mantenimientos, diagnósticos, trabajos realizados y repuestos.
+### 3. Operaciones: Asignaciones y Mantenimientos
+- `asignacion_equipo` ([AsignacionEquipo](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/AsignacionEquipo.java)): Asignación del equipo al despacho y personal custodio con rango de fechas.
+- `tipo_mantenimiento` ([TipoMantenimiento](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/TipoMantenimiento.java)): Preventivo, correctivo u overhaul.
+- `mantenimiento` ([Mantenimiento](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Mantenimiento.java)): Registro de intervenciones técnicas, diagnóstico, trabajos efectuados, repuestos utilizados y técnico responsable.
+
+### 4. Seguridad
+- `rol` ([Rol](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Rol.java)): Perfiles y roles de usuario.
+- `usuario` ([Usuario](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/Usuario.java)): Usuarios del sistema y estado de cuenta.
 - `usuario_rol` ([UsuarioRol](file:///d:/aplicacionesWeb/SistemaInventario_AplicacionesWeb/backend/proyectoinventario/src/main/java/aplicacionesweb/proyectoinventario/entity/UsuarioRol.java)): Asignación de roles por usuario.
 
 ---
 
 ## 🛠️ Configuración y Ejecución
 
-### 1. Clonar el Repositorio
-```bash
-git clone https://github.com/KinglotusPe/SeguimientoEgresados_AplicacionesWeb.git
-cd SeguimientoEgresados_AplicacionesWeb
-```
-
-### 2. Base de Datos (PostgreSQL)
-1. Abre tu cliente PostgreSQL (pgAdmin, DBeaver o psql).
-2. Crea la base de datos `bd_inventario`:
+### 1. Base de Datos (PostgreSQL)
+1. Conéctate a PostgreSQL y crea la base de datos:
    ```sql
-   CREATE DATABASE bd_inventario;
+   CREATE DATABASE bd_multifuncionales;
    ```
-3. Ejecuta el script de creación:
+2. Ejecuta el script de creación de tablas:
    ```text
    database/01_create_tables_postgresql.sql
    ```
 
-### 3. Configurar el Backend
-Revisa el archivo `backend/proyectoinventario/src/main/resources/application.properties`:
+### 2. Configuración en `application.properties`
+Ajusta tus credenciales en `backend/proyectoinventario/src/main/resources/application.properties`:
 ```properties
-spring.application.name=seguimiento-egresados
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/bd_inventario
-spring.datasource.username=tu_usuario_postgres
-spring.datasource.password=tu_contrasena_postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/bd_multifuncionales
+spring.datasource.username=postgres
+spring.datasource.password=tu_contrasena
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 spring.jpa.hibernate.ddl-auto=update
@@ -116,16 +120,14 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-### 4. Compilar y Ejecutar
+### 3. Compilar y Ejecutar
 
 Desde la carpeta `backend/proyectoinventario`:
 
 ```powershell
-# Compilar
+# Compilar proyecto
 .\mvnw.cmd clean compile
 
-# Ejecutar la aplicación
+# Iniciar servidor Spring Boot
 .\mvnw.cmd spring-boot:run
 ```
-
-La aplicación se iniciará en `http://localhost:8080`.
